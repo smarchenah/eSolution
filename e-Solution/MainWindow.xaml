@@ -1,0 +1,809 @@
+﻿<Window x:Class="e_Solution.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:e_Solution"        
+        xmlns:local1="http://schemas.xceed.com/wpf/xaml/datagrid"
+        mc:Ignorable="d"
+        Title="e-Solution" Height="886" Width="1600" WindowState="Maximized">
+
+    <Window.Resources>
+        <!-- Menu Style -->
+        <Style x:Key="menuStyles" TargetType="Menu">
+            <Setter Property="Background" Value="#FFFBF9F8" />
+            <Setter Property="Foreground" Value="Black" />
+            <Setter Property="FontFamily" Value="16px/1.4rem Raleway,Arial,Helvetica,sans-serif;" />
+        </Style>
+        <ContextMenu  x:Key="TextBoxContextMenu"></ContextMenu>
+
+        <!-- Slider Importance -->
+        <Style x:Key="SliderRepeatButton" TargetType="RepeatButton">
+            <Setter Property="SnapsToDevicePixels" Value="true" />
+            <Setter Property="OverridesDefaultStyle" Value="true" />
+            <Setter Property="IsTabStop" Value="false" />
+            <Setter Property="Focusable" Value="false" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RepeatButton">
+                        <Border Background="Transparent"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="SliderRepeatButton1" TargetType="RepeatButton">
+            <Setter Property="SnapsToDevicePixels" Value="true" />
+            <Setter Property="OverridesDefaultStyle" Value="true" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RepeatButton">
+                        <Border SnapsToDevicePixels="True" Background="YellowGreen"  BorderThickness="1" 
+                                BorderBrush="YellowGreen" Height="3"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="SliderThumb" TargetType="Thumb">
+            <Setter Property="SnapsToDevicePixels" Value="true" />
+            <Setter Property="OverridesDefaultStyle" Value="true" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Thumb">
+                        <StackPanel Orientation="Vertical">
+                            <Path Data="M 0 0 L 8 0 L 4 6 Z"  Stroke="YellowGreen" Margin="-2,0,0,0" 
+                                  StrokeThickness="2" Fill="YellowGreen"></Path>
+                            <Line X1="0" Y1="0" X2="0" Y2="7" Stroke="Gray" StrokeThickness="1" 
+                                  Margin="2,0,0,0" StrokeDashArray="1.5,1.5"></Line>
+                            <TextBlock Foreground="Black" Margin="-2,30,0,0" 
+                                       Text="{Binding Value, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Slider}}}"/>
+                        </StackPanel>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <ControlTemplate x:Key="Slider"  TargetType="Slider">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" MinHeight="{TemplateBinding MinHeight}" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <TickBar  x:Name="TopTick"  Fill="LightGray" VerticalAlignment="Top" 
+                          SnapsToDevicePixels="True" Grid.Row="0" Placement="Top" Height="5" 
+                          Visibility="Visible"/>
+                <Border BorderBrush="LightGray"  BorderThickness="0,0,0,1" ></Border>
+                <Border x:Name="TrackBackground" VerticalAlignment="Center" Margin="0,-10,0,0" 
+                        BorderBrush="Red" Background="Red" Height="3" Grid.Row="1" BorderThickness="1"/>
+                <Track Grid.Row="1" x:Name="PART_Track" Margin="0,-10,0,0"  >
+                    <Track.DecreaseRepeatButton>
+                        <RepeatButton Style="{StaticResource SliderRepeatButton1}" 
+                                      Command="Slider.DecreaseLarge" />
+                    </Track.DecreaseRepeatButton>
+                    <Track.Thumb>
+                        <Thumb Style="{StaticResource SliderThumb}" Margin="0,-10,0,0" />
+                    </Track.Thumb>
+                    <Track.IncreaseRepeatButton>
+                        <RepeatButton Style="{StaticResource SliderRepeatButton}" 
+                                      Command="Slider.IncreaseLarge" />
+                    </Track.IncreaseRepeatButton>
+                </Track>
+                <TextBlock Text="" Grid.Row="1" Margin="0,15,0,0"></TextBlock>
+                <TickBar x:Name="BottomTick" Fill="LightGray" SnapsToDevicePixels="True" Grid.Row="2"   
+                         Placement="Bottom" Height="4" Visibility="Collapsed" />
+            </Grid>
+            <ControlTemplate.Triggers>
+                <Trigger Property="TickPlacement"  Value="TopLeft">
+                    <Setter TargetName="TopTick" Property="Visibility"  Value="Visible" />
+                </Trigger>
+                <Trigger Property="TickPlacement" Value="BottomRight">
+                    <Setter TargetName="BottomTick"  Property="Visibility"  Value="Visible" />
+                </Trigger>
+                <Trigger Property="TickPlacement" Value="Both">
+                    <Setter TargetName="TopTick" Property="Visibility" Value="Visible" />
+                    <Setter TargetName="BottomTick" Property="Visibility" Value="Visible" />
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+
+        <Style x:Key="Horizontal_Slider" TargetType="Slider">
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="SnapsToDevicePixels" Value="true" />
+            <Setter Property="OverridesDefaultStyle" Value="true" />
+            <Style.Triggers>
+                <Trigger Property="Orientation" Value="Horizontal">
+                    <Setter Property="MinHeight" Value="21" />
+                    <Setter Property="MinWidth" Value="104" />
+                    <Setter Property="Template" Value="{StaticResource Slider}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Toggle YES/NO -->
+        <Style x:Key="AnimatedSwitch" TargetType="{x:Type ToggleButton}">
+            <Setter Property="Foreground" Value="Black" />
+            <Setter Property="Background" Value="#FAFAFB" />
+            <Setter Property="BorderBrush" Value="#EAEAEB" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Viewbox Stretch="Uniform">
+                            <Canvas Name="Layer_1" Width="20" Height="20" Canvas.Left="10" Canvas.Top="0">
+                                <Ellipse  Canvas.Left="0" Width="20" Height="20" Fill="{TemplateBinding Background}" Stroke="{TemplateBinding BorderBrush}" StrokeThickness="0.5"/>
+                                <Ellipse  Canvas.Left="15" Width="20" Height="20" Fill="{TemplateBinding Background}" Stroke="{TemplateBinding BorderBrush}" StrokeThickness="0.5"/>
+                                <Border Canvas.Left="10" Width="15" Height="20" Name="rect416927" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="0,0.5,0,0.5"/>
+                                <Ellipse x:Name="ellipse"  Canvas.Left="0" Width="20" Height="20" Fill="White" Stroke="{TemplateBinding BorderBrush}" StrokeThickness="0.3">
+                                    <Ellipse.RenderTransform>
+                                        <TranslateTransform X="0" Y="0" />
+                                    </Ellipse.RenderTransform>
+                                    <Ellipse.BitmapEffect>
+                                        <DropShadowBitmapEffect Softness="0.1" ShadowDepth="0.7" Direction="270" Color="#BBBBBB"/>
+                                    </Ellipse.BitmapEffect>
+                                </Ellipse>
+                            </Canvas>
+                        </Viewbox>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True" >
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <ColorAnimation Storyboard.TargetProperty="Background.Color" To="#52D468" Duration="0:0:0.2" />
+                                            <ColorAnimation Storyboard.TargetProperty="BorderBrush.Color" To="#41C955" Duration="0:0:0.2" />
+                                            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(Ellipse.RenderTransform).(TranslateTransform.X)" Storyboard.TargetName="ellipse">
+                                                <SplineDoubleKeyFrame KeyTime="0" Value="0"/>
+                                                <SplineDoubleKeyFrame KeyTime="0:0:0.4" Value="15" KeySpline="0, 1, 0.6, 1"/>
+                                            </DoubleAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <ColorAnimation Storyboard.TargetProperty="Background.Color" To="#FAFAFB" Duration="0:0:0.2" />
+                                            <ColorAnimation Storyboard.TargetProperty="BorderBrush.Color" To="#EAEAEB" Duration="0:0:0.2" />
+                                            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(Ellipse.RenderTransform).(TranslateTransform.X)" Storyboard.TargetName="ellipse">
+                                                <SplineDoubleKeyFrame KeyTime="0" Value="15"/>
+                                                <SplineDoubleKeyFrame KeyTime="0:0:0.3" Value="0" KeySpline="0, 0.5, 0.5, 1"/>
+                                            </DoubleAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Text-color Style Red -->
+        <Style TargetType="{x:Type RadioButton}" x:Key="buttonstripeRed">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type RadioButton}">
+                        <BulletDecorator Cursor="Hand">
+                            <!--Text element-->
+                            <Border Width="60" Height="20" CornerRadius="3" BorderBrush="#FFE2E2E2" BorderThickness="1">
+                                <Grid>
+                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    <!--We don't need any bullet, cause our border is the switching element-->
+                                    <Border Margin="5,0,48,0" Background="#FFCDCDCD" CornerRadius="1" Name="RadioMark" />
+                                    <!-- To change the apearance to button stripe 2, edit the margins! -->
+                                </Grid>
+
+                                <Border.Background>
+                                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                        <GradientStop Color="White" Offset="0" />
+                                        <GradientStop Color="#FFE2E2E2" Offset="1" />
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                            </Border>
+                        </BulletDecorator>
+
+                        <!--If item is checked, trigger the visibility of the mark-->
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="true">
+                                <Setter TargetName="RadioMark" Property="Background" Value="Red"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Text-color Style Black -->
+        <Style TargetType="{x:Type RadioButton}" x:Key="buttonstripeBlack">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type RadioButton}">
+                        <BulletDecorator Cursor="Hand">
+                            <!--Text element-->
+                            <Border Width="60" Height="20" CornerRadius="3" BorderBrush="#FFE2E2E2" BorderThickness="1">
+                                <Grid>
+                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    <!--We don't need any bullet, cause our border is the switching element-->
+                                    <Border Margin="5,0,48,0" Background="#FFCDCDCD" CornerRadius="1" Name="RadioMark" />
+                                    <!-- To change the apearance to button stripe 2, edit the margins! -->
+                                </Grid>
+
+                                <Border.Background>
+                                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                        <GradientStop Color="White" Offset="0" />
+                                        <GradientStop Color="#FFE2E2E2" Offset="1" />
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                            </Border>
+                        </BulletDecorator>
+
+                        <!--If item is checked, trigger the visibility of the mark-->
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="true">
+                                <Setter TargetName="RadioMark" Property="Background" Value="Black"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Text-color Style Blue-->
+        <Style TargetType="{x:Type RadioButton}" x:Key="buttonstripeBlue">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type RadioButton}">
+                        <BulletDecorator Cursor="Hand">
+                            <!--Text element-->
+                            <Border Width="60" Height="20" CornerRadius="3" BorderBrush="#FFE2E2E2" BorderThickness="1">
+                                <Grid>
+                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    <!--We don't need any bullet, cause our border is the switching element-->
+                                    <Border Margin="5,0,48,0" Background="#FFCDCDCD" CornerRadius="1" Name="RadioMark" />
+                                    <!-- To change the apearance to button stripe 2, edit the margins! -->
+                                </Grid>
+
+                                <Border.Background>
+                                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                        <GradientStop Color="White" Offset="0" />
+                                        <GradientStop Color="#FFE2E2E2" Offset="1" />
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                            </Border>
+                        </BulletDecorator>
+
+                        <!--If item is checked, trigger the visibility of the mark-->
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="true">
+                                <Setter TargetName="RadioMark" Property="Background" Value="Blue"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- DataGrid Row template -->
+        <Style x:Key="RowStyleWithAlternation" TargetType="DataGridRow">
+            <Setter Property="SnapsToDevicePixels" Value="True" />
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="FontWeight" Value="Normal"/>
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="ContextMenu" Value="{x:Null}"/>
+            <Style.Triggers>
+                <Trigger Property="AlternationIndex" Value="1">
+                    <Setter Property="Background" Value="#FFD0D0E0"/>
+                </Trigger>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#F9F99F"/>
+                </Trigger>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#F9F99F" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Datagrid Header template -->
+        <Style x:Key="ColumnHeaderStyle" TargetType="{x:Type DataGridColumnHeader}">
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Background" Value="Black" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Width" Value="Auto" />
+            <Setter Property="Padding" Value="5" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="DataGridColumnHeader">
+                        <Border x:Name="headerBorder" Background="Black">
+                            <Border BorderThickness="0.5" CornerRadius="2" Background="#7d7e80">
+                                <Grid>
+                                    <TextBlock Text="{TemplateBinding Content}" 
+                                        VerticalAlignment="Center" 
+                                        HorizontalAlignment="Center" 
+                                        TextWrapping="Wrap"
+                                        Margin="10"/>
+                                </Grid>
+                            </Border>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Listbox template -->
+        <DataTemplate x:Key="DataTemplateItemDirect">
+            <Canvas Width="180" Height="125" Background="#FFECEAEA">
+                <StackPanel>
+                    <Image Source="{Binding PictureString}" HorizontalAlignment="Left" Margin="30,0" Name="ImageName" Height="90" Width="90"/>
+                    <TextBlock x:Name="tbName" FontSize="16" Text="{Binding Name}" HorizontalAlignment="Left" Margin="20,0" />
+                </StackPanel>
+            </Canvas>
+        </DataTemplate>
+
+    </Window.Resources>
+
+    <Grid Opacity="0.7">
+        <Grid.Background>
+            <LinearGradientBrush EndPoint="0.5,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
+                <GradientStop Color="Gray" Offset="1"/>
+                <GradientStop Color="White"/>
+            </LinearGradientBrush>
+        </Grid.Background>
+
+        <DockPanel  Name="dockPanelMenu" 
+                    Height="35" Width="Auto"  
+                    HorizontalAlignment="Stretch" 
+                    VerticalAlignment="Top" 
+                    DockPanel.Dock="Top" 
+                    LastChildFill="False">
+
+            <Menu Name="MainMenu"
+                  Height="35" Width="Auto"   
+                  DockPanel.Dock="Top" 
+                  FontSize="18"
+                  Margin="10,0,0,0"
+                  Style="{StaticResource menuStyles}">
+
+                <MenuItem Header="Home" Name="HomeMenu" Padding="5,4,0,0" Width="120" Height="35" Click="HomeMenu_Click">
+                    <MenuItem.Icon>
+                        <Image Source="img/home.png" Margin="-1,-2,-5,-5" />
+                    </MenuItem.Icon>
+                </MenuItem>
+
+                <MenuItem Header="Admin" Name="AdminMenu" Padding="5,4,0,0" Width="120" Click="AdminMenu_Click" Height="35">
+                    <MenuItem.Icon>
+                        <Image Source="img/admin.png" Margin="-1,-2,-5,-5" />
+                    </MenuItem.Icon>
+                </MenuItem>
+
+                <MenuItem Header="Benutzer" Name="UserMenu" Padding="5,4,0,0" Width="122" Click="UserMenu_Click">
+                    <MenuItem.Icon>
+                        <Image Source="img/user.png" Margin="-1,-2,-5,-5" />
+                    </MenuItem.Icon>
+                </MenuItem>
+
+                <MenuItem Header="Statistiks" Name="StatisticsMenu" Padding="5,4,0,0" Width="150" Click="StatisticsMenu_Click">
+                    <MenuItem.Icon>
+                        <Image Source="img/statistics.png" Margin="-1,-2,-5,-5"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+            </Menu>
+        </DockPanel>
+
+        <StackPanel Name="homePanel" VerticalAlignment="Center" HorizontalAlignment="Center" Visibility="Visible">
+            <Border BorderBrush="Gray" BorderThickness="2">
+                <Image Height="261" Source="img\eSolution.jpg" VerticalAlignment="Center" HorizontalAlignment="Center" Width="803" Opacity="0.8" />
+            </Border>
+        </StackPanel>
+
+        <StackPanel Name="adminPanel" 
+                Height="805" Width="1592"  
+                HorizontalAlignment="Right" 
+                VerticalAlignment="Top" 
+                DockPanel.Dock="Top"                     
+                Margin="0,35,0,0"
+                Visibility="Hidden">
+
+            <StackPanel HorizontalAlignment="Left" Width="1592">
+                <Label FontSize="40" FontFamily="Raleway" Content="Admin" Foreground="#FFF96F0B" FontWeight="Bold" Height="47" Margin="30,30,0,0" HorizontalAlignment="Left" Width="269"/>
+                <Label FontSize="18" FontFamily="Raleway" Content="In diesem Fenster können Sie neue Frage erstellen." Foreground="#7d7e80" FontWeight="Bold" Height="35" Margin="30,0,0,0" HorizontalAlignment="Left" Width="643"/>
+            </StackPanel>
+            <Border BorderThickness="1" BorderBrush="black" VerticalAlignment="Center" Margin="30,20,0,0" HorizontalAlignment="Left" Width="670" >
+                <StackPanel Margin="0,0,-1,0" Height="159">
+                    <WrapPanel VerticalAlignment="Top" Margin="30,20,10,0">
+                        <Label FontSize="18" FontFamily="Raleway" Content="Wichtigkeit:" Foreground="#7d7e80" FontWeight="Bold" Height="38"/>
+                        <Slider x:Name="sliderImportance" Style="{StaticResource Horizontal_Slider}" VerticalAlignment="Center" 
+                            IsSnapToTickEnabled="True" TickFrequency="1" Minimum="0" Maximum="10" Width="429" 
+                            Margin="25,0,50,0"/>
+                    </WrapPanel>
+
+                    <WrapPanel VerticalAlignment="Top" Height="35" Margin="0,5,224,0">
+                        <Label Width="93" FontFamily="Raleway" FontSize="18" Foreground="#7d7e80" FontWeight="Bold" Content="Dringend:" HorizontalAlignment="Center" 
+                               Margin="50,0,0,0"/>
+                        <ToggleButton x:Name="toggleUrgency" Style="{StaticResource AnimatedSwitch}" Height="20" Margin="8,0"/>
+                    </WrapPanel>
+
+                    <WrapPanel VerticalAlignment="Top" HorizontalAlignment="Left" Height="40" Width="400" Margin="0,10,0,20">
+                        <Label Width="116" FontFamily="Raleway" FontSize="18" Foreground="#7d7e80" FontWeight="Bold" Content="Text-Farbe:" HorizontalAlignment="Center" Margin="42,0,0,0"/>
+                        <RadioButton x:Name="rbRed" Style="{StaticResource buttonstripeRed}" Width="60" Margin="10,0,5,0" Content="Red" Click="rbRed_Click"></RadioButton>
+                        <RadioButton x:Name="rbBlack" Style="{StaticResource buttonstripeBlack}" Width="60" Margin="0,0,5,0" Content="Black" Click="rbBlack_Click"></RadioButton>
+                        <RadioButton x:Name="rbBlue" Style="{StaticResource buttonstripeBlue}" Width="60" Content="Blue" Click="rbBlue_Click"></RadioButton>
+                    </WrapPanel>
+                </StackPanel>
+            </Border>
+            <Border BorderThickness="1" BorderBrush="black" VerticalAlignment="Center" Margin="720,-161,0,0" Height="160" HorizontalAlignment="Left" Width="620">
+                <StackPanel VerticalAlignment="Top" Height="168" Margin="0,0,0,-1">
+                    <Label Width="140" FontFamily="Raleway" FontSize="18" Foreground="#7d7e80" FontWeight="Bold" Content="Frage erstellen:" HorizontalAlignment="Left" Margin="10,10,0,0" Height="30"/>
+                    <TextBox x:Name="txtQuestion" FontSize="16" Background="White" HorizontalAlignment="Left" Margin="15,0,0,0" Width="589" Height="109"/>
+                </StackPanel>
+            </Border>
+            <WrapPanel HorizontalAlignment="Right" Margin="0,15,1242,0">
+                <Button x:Name="btnSendQuestion" Cursor="Hand" FontFamily="Raleway" Background="#FFF96F0B" Foreground="#fff" Width="150" Height="35" FontSize="18" 
+                        Margin="10" Click="btnSendQuestion_Click">Frage speichern</Button>
+                <Button x:Name="btnNewQuestion" Cursor="Hand" FontFamily="Raleway" Background="#FFF96F0B" Foreground="#fff" Width="150" Height="35" FontSize="18" 
+                        Margin="0,0,10,0" Click="btnNewQuestion_Click">Neue Frage</Button>
+            </WrapPanel>
+            <StackPanel HorizontalAlignment="Left" Width="1582" Height="43" >
+                <Label x:Name="lblErrorInfoAdmin" VerticalAlignment="Center" FontFamily="Raleway" FontSize="16" Foreground="Red" FontWeight="Bold" 
+                       Content="Bitte, prüfen Sie ob Sie die Text-Farbe und die Frage ausgefüllt haben." Visibility="Hidden" Margin="30,10,960,0" Height="27"/>
+            </StackPanel>
+
+            <StackPanel x:Name="openQuestionsPanel" Width="1114" Height="308" HorizontalAlignment="Left" Margin="27,20,0,0">
+                <Label x:Name="lblOpenQuestions" FontFamily="Raleway" FontSize="18" Foreground="#7d7e80" FontWeight="Bold" HorizontalAlignment="Left" Width="194">Offene Fragen:</Label>
+                <DataGrid x:Name="dgQuestionsAdmin" AutoGenerateColumns="False" Background="LightGray" Width="Auto" FontSize="16"  
+                          Height="275"  ColumnHeaderStyle="{DynamicResource ColumnHeaderStyle}"
+                          SelectionMode="Single" ColumnWidth="Auto" IsReadOnly="True" MouseDoubleClick="dgQuestionsAdmin_MouseDoubleClick">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Id" Visibility="Collapsed" Binding="{Binding id}"/>
+                        <DataGridTemplateColumn Header="Wichtigkeit">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Image x:Name="IMG" Width="25" Source="img\0.jpg" />
+                                    <DataTemplate.Triggers>
+                                        <DataTrigger Binding="{Binding Path=importance}" Value="0">
+                                            <Setter Property="Source" Value="img\0.jpg" TargetName="IMG"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Path=importance}" Value="1">
+                                            <Setter Property="Source" Value="img\1.jpg" TargetName="IMG"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Path=importance}" Value="2">
+                                            <Setter Property="Source" Value="img\2.jpg" TargetName="IMG"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Path=importance}" Value="3">
+                                            <Setter Property="Source" Value="img\3.jpg" TargetName="IMG"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Path=importance}" Value="4">
+                                            <Setter Property="Source" Value="img\4.jpg" TargetName="IMG"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Path=importance}" Value="5">
+                                            <Setter Property="Source" Value="img\5.jpg" TargetName="IMG"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Path=importance}" Value="6">
+                                            <Setter Property="Source" Value="img\6.jpg" TargetName="IMG"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Path=importance}" Value="7">
+                                            <Setter Property="Source" Value="img\7.jpg" TargetName="IMG"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Path=importance}" Value="8">
+                                            <Setter Property="Source" Value="img\8.jpg" TargetName="IMG"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Path=importance}" Value="9">
+                                            <Setter Property="Source" Value="img\9.jpg" TargetName="IMG"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Path=importance}" Value="10">
+                                            <Setter Property="Source" Value="img\10.jpg" TargetName="IMG"/>
+                                        </DataTrigger>
+                                    </DataTemplate.Triggers>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Header="Dringend">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Image x:Name="IMG" Width="25" Source="img\yes.jpg" />
+                                    <DataTemplate.Triggers>
+                                        <DataTrigger Binding="{Binding Path=urgent}" Value="False">
+                                            <Setter Property="Source" Value="img\no.jpg" TargetName="IMG"/>
+                                        </DataTrigger>
+                                    </DataTemplate.Triggers>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn Header="Frage" Binding="{Binding question}" Width="500"/>
+                        <DataGridTemplateColumn Header="Text-Farbe">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Image x:Name="IMG" Width="25" Source="img\no.jpg" />
+                                    <DataTemplate.Triggers>
+                                        <DataTrigger Binding="{Binding Path=textColor}" Value="Red">
+                                            <Setter Property="Source" Value="img\red.jpg" TargetName="IMG"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Path=textColor}" Value="Black">
+                                            <Setter Property="Source" Value="img\black.jpg" TargetName="IMG"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Path=textColor}" Value="Blue">
+                                            <Setter Property="Source" Value="img\blue.jpg" TargetName="IMG"/>
+                                        </DataTrigger>
+                                    </DataTemplate.Triggers>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn Header="Datum" Binding="{Binding date}"/>
+                        <DataGridTextColumn Header="Benutzer" Binding="{Binding user}"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </StackPanel>
+        </StackPanel>
+
+        <StackPanel Name="userPanel" 
+                    Height="810" Width="Auto"  
+                    HorizontalAlignment="Stretch" 
+                    VerticalAlignment="Top" 
+                    DockPanel.Dock="Top"                     
+                    Margin="0,35,0,0"
+                    Visibility="Hidden">
+
+            <StackPanel>
+                <Label FontSize="40" FontFamily="Raleway" Content="Benutzer" Foreground="#FFF96F0B" FontWeight="Bold" Height="47" Margin="30,30,1293,0"/>
+                <Label FontSize="18" FontFamily="Raleway" Content="In diesem Fenster können Sie eine bestimmte Frage beantworten." Foreground="#7d7e80" FontWeight="Bold" Height="29" Margin="30,0,919,0"/>
+            </StackPanel>
+            <WrapPanel>
+                <StackPanel>
+                    <Label Margin="27,10,0,0" FontSize="18" Width="80" HorizontalAlignment="Left">Antwort:</Label>
+                    <TextBox x:Name="txtAnswer" AcceptsReturn="True" VerticalScrollBarVisibility="Visible" FontSize="18" Width="706" Height="150" Background="White" HorizontalAlignment="Left" Margin="30,0,0,0"></TextBox>
+                </StackPanel>
+                <Border BorderThickness="1" BorderBrush="#FFF96F0B" VerticalAlignment="Center" Margin="30,30" CornerRadius="20,0,20,0">
+                    <StackPanel Width="701" Height="153" HorizontalAlignment="Left" Margin="10,10,0,0">
+                        <Label Margin="5,0,0,0" FontFamily="Raleway" FontSize="18" Width="100" VerticalAlignment="Center" HorizontalAlignment="Left">Frage:</Label>
+                        <Label x:Name="lblQuestionUser" Visibility="Hidden" FontFamily="Raleway" Margin="5,0,0,0" FontSize="18" Width="686" VerticalAlignment="Center" HorizontalAlignment="Left" Height="112">[question]</Label>
+                    </StackPanel>
+                </Border>
+            </WrapPanel>
+
+            <WrapPanel HorizontalAlignment="Left" Margin="0,0">
+                <Label Margin="27,0,0,0" FontFamily="Raleway" FontSize="18" Width="100" VerticalAlignment="Center" HorizontalAlignment="Left">Vorname:</Label>
+                <TextBox x:Name="txtFirstName" FontFamily="Raleway" FontSize="18" HorizontalAlignment="Left" Width="180" Height="25" Margin="0,0,0,0"></TextBox>
+                <Label Margin="27,0,0,0" FontFamily="Raleway" FontSize="18" Width="100" VerticalAlignment="Center" HorizontalAlignment="Left">Nachname:</Label>
+                <TextBox x:Name="txtLastName" FontFamily="Raleway" FontSize="18" HorizontalAlignment="Left" Width="180" Height="25" Margin="10,0,0,0"></TextBox>
+            </WrapPanel>
+            <StackPanel HorizontalAlignment="Left" Margin="20,10">
+                <Button x:Name="btnSendAnswer" Cursor="Hand" FontFamily="Raleway" Background="#FFF96F0B" Foreground="#fff" Width="140" Height="35" FontSize="18" 
+                        Margin="10" Click="btnSendAnswer_Click">Antworten</Button>
+            </StackPanel>
+            <StackPanel HorizontalAlignment="Left" Width="1582" Height="35" >
+                <Label x:Name="lblErrorInfoUser" VerticalAlignment="Top" FontFamily="Raleway" FontSize="16" Foreground="Red" FontWeight="Bold" 
+                       Content="Bitte, prüfen Sie ob Sie die Antwort, Vorname und Nachname ausgefüllt haben." Visibility="Hidden" Margin="30,0,960,0" Height="27"/>
+            </StackPanel>
+            <StackPanel Margin="0,10,528,50">
+                <Label FontSize="18" FontFamily="Raleway" Content="Bitte, wählen Sie mit 'Doppel-klick' eine nicht antwortete Frage, damit Sie es beantwortet." Foreground="#FFF96F0B" FontWeight="Bold" Height="33" Margin="30,0,79,0"/>
+                <Label x:Name="lblNoQuestionsAvailable" FontSize="18" FontFamily="Raleway" Visibility="Hidden" Content="Alle die Fragen sind schon beantwortet oder es gibt keine Frage in Moment." Foreground="White" FontWeight="Bold" Height="33" Margin="30,10,320,0"/>
+                <DataGrid x:Name="dgQuestionsNotAnswered" AutoGenerateColumns="False" Width="Auto" FontSize="16" Margin="25,-20,10,0" Background="LightGray" 
+                          Height="179" RowStyle="{StaticResource RowStyleWithAlternation}" ColumnHeaderStyle="{DynamicResource ColumnHeaderStyle}" 
+                          SelectionMode="Single" IsReadOnly="True" MouseDoubleClick="dgQuestionsNotAnswered_MouseDoubleClick">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Id" Visibility="Hidden" Binding="{Binding id}"/>
+                        <DataGridTemplateColumn Header="Wichtigkeit">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Image x:Name="IMG" Width="25" Source="img\0.jpg" />
+                                    <DataTemplate.Triggers>
+                                        <DataTrigger Binding="{Binding Path=importance}" Value="0">
+                                            <Setter Property="Source" Value="img\0.jpg" TargetName="IMG"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Path=importance}" Value="1">
+                                            <Setter Property="Source" Value="img\1.jpg" TargetName="IMG"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Path=importance}" Value="2">
+                                            <Setter Property="Source" Value="img\2.jpg" TargetName="IMG"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Path=importance}" Value="3">
+                                            <Setter Property="Source" Value="img\3.jpg" TargetName="IMG"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Path=importance}" Value="4">
+                                            <Setter Property="Source" Value="img\4.jpg" TargetName="IMG"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Path=importance}" Value="5">
+                                            <Setter Property="Source" Value="img\5.jpg" TargetName="IMG"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Path=importance}" Value="6">
+                                            <Setter Property="Source" Value="img\6.jpg" TargetName="IMG"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Path=importance}" Value="7">
+                                            <Setter Property="Source" Value="img\7.jpg" TargetName="IMG"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Path=importance}" Value="8">
+                                            <Setter Property="Source" Value="img\8.jpg" TargetName="IMG"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Path=importance}" Value="9">
+                                            <Setter Property="Source" Value="img\9.jpg" TargetName="IMG"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Path=importance}" Value="10">
+                                            <Setter Property="Source" Value="img\10.jpg" TargetName="IMG"/>
+                                        </DataTrigger>
+                                    </DataTemplate.Triggers>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Header="Dringend">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Image x:Name="IMG" Width="25" Source="img\yes.jpg" />
+                                    <DataTemplate.Triggers>
+                                        <DataTrigger Binding="{Binding Path=urgent}" Value="False">
+                                            <Setter Property="Source" Value="img\no.jpg" TargetName="IMG"/>
+                                        </DataTrigger>
+                                    </DataTemplate.Triggers>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn Header="Frage" Binding="{Binding question}"/>
+                        <DataGridTemplateColumn Header="Text-Farbe">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Image x:Name="IMG" Width="25" Source="img\no.jpg" />
+                                    <DataTemplate.Triggers>
+                                        <DataTrigger Binding="{Binding Path=textColor}" Value="Red">
+                                            <Setter Property="Source" Value="img\red.jpg" TargetName="IMG"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Path=textColor}" Value="Black">
+                                            <Setter Property="Source" Value="img\black.jpg" TargetName="IMG"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Path=textColor}" Value="Blue">
+                                            <Setter Property="Source" Value="img\blue.jpg" TargetName="IMG"/>
+                                        </DataTrigger>
+                                    </DataTemplate.Triggers>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn Header="Datum" Binding="{Binding date}"/>
+                        <DataGridTextColumn Header="Benutzer" Binding="{Binding user}"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </StackPanel>
+        </StackPanel>
+
+        <StackPanel Name="statisticsPanel" 
+                    Height="820" Width="Auto"  
+                    HorizontalAlignment="Stretch" 
+                    VerticalAlignment="Top" 
+                    DockPanel.Dock="Top"                     
+                    Margin="0,35,0,0"
+                    Visibility="Hidden">
+
+            <StackPanel>
+                <Label FontSize="40" FontFamily="Raleway" Content="Statistiks" Foreground="#FFF96F0B" FontWeight="Bold" Height="47" Margin="30,30,1293,0"/>
+                <Label FontSize="18" FontFamily="Raleway" Content="In diesem Fenster können Sie verschiedene Statistiks sehen." Foreground="#7d7e80" FontWeight="Bold" Height="29" Margin="30,0,919,0"/>
+            </StackPanel>
+            <StackPanel Margin="0,0">
+                <Label x:Name="lblStatisticsInfo" FontSize="18" FontFamily="Raleway" Foreground="#FFF96F0B" Content="" FontWeight="Bold" Height="29" Margin="30,0,647,0"/>
+            </StackPanel>
+            <WrapPanel Margin="30,30" Height="651">
+                <DockPanel Height="561" Width="200">
+                    <ListBox x:Name="lbUsers" HorizontalAlignment="Left" Background="LightGray" DockPanel.Dock="Left" ItemTemplate="{DynamicResource DataTemplateItemDirect}" 
+                             ItemsSource="{Binding Items}" Width="195" IsSynchronizedWithCurrentItem="True" SelectionChanged="lbUsers_SelectionChanged"/>
+                </DockPanel>
+                <StackPanel Margin="10,0,0,0" VerticalAlignment="Top" Height="558" Width="1312">
+                    <WrapPanel>
+                        <Label x:Name="lblSelectedUser" Margin="65,0,0,0" FontSize="40" Width="379" VerticalAlignment="Center" Content="" HorizontalAlignment="Left"></Label>
+                    </WrapPanel>
+                    <WrapPanel Margin="20,0">
+                        <Label Margin="41,0,0,0" FontSize="16" Width="252" VerticalAlignment="Center" HorizontalAlignment="Left">Anzahl der beantworteten Fragen:</Label>
+                        <Slider x:Name="sliderQuestionsAnswered" Style="{StaticResource Horizontal_Slider}" VerticalAlignment="Center" 
+                            IsSnapToTickEnabled="True" TickFrequency="1" Minimum="0" Maximum="10" Width="450" Margin="28,0,50,0" IsEnabled="False"/>
+                    </WrapPanel>
+                    <StackPanel Margin="40,10,374,0">
+                        <Label Margin="23,0,0,0" FontSize="16" Width="181" VerticalAlignment="Center" HorizontalAlignment="Left">Benutzerantworten:</Label>
+                        <DataGrid x:Name="dgUserAnswers" AutoGenerateColumns="False" Width="Auto" FontSize="16" Margin="25,0,10,0" Background="LightGray" 
+                          Height="145" RowStyle="{StaticResource RowStyleWithAlternation}" ColumnHeaderStyle="{DynamicResource ColumnHeaderStyle}" 
+                          SelectionMode="Single" IsReadOnly="True" MouseDoubleClick="dgUserAnswers_MouseDoubleClick">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Id" Visibility="Hidden" Binding="{Binding id}"/>
+                                <DataGridTemplateColumn Header="Wichtigkeit">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Image x:Name="IMG" Width="25" Source="img\0.jpg" />
+                                            <DataTemplate.Triggers>
+                                                <DataTrigger Binding="{Binding Path=importance}" Value="0">
+                                                    <Setter Property="Source" Value="img\0.jpg" TargetName="IMG"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding Path=importance}" Value="1">
+                                                    <Setter Property="Source" Value="img\1.jpg" TargetName="IMG"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding Path=importance}" Value="2">
+                                                    <Setter Property="Source" Value="img\2.jpg" TargetName="IMG"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding Path=importance}" Value="3">
+                                                    <Setter Property="Source" Value="img\3.jpg" TargetName="IMG"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding Path=importance}" Value="4">
+                                                    <Setter Property="Source" Value="img\4.jpg" TargetName="IMG"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding Path=importance}" Value="5">
+                                                    <Setter Property="Source" Value="img\5.jpg" TargetName="IMG"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding Path=importance}" Value="6">
+                                                    <Setter Property="Source" Value="img\6.jpg" TargetName="IMG"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding Path=importance}" Value="7">
+                                                    <Setter Property="Source" Value="img\7.jpg" TargetName="IMG"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding Path=importance}" Value="8">
+                                                    <Setter Property="Source" Value="img\8.jpg" TargetName="IMG"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding Path=importance}" Value="9">
+                                                    <Setter Property="Source" Value="img\9.jpg" TargetName="IMG"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding Path=importance}" Value="10">
+                                                    <Setter Property="Source" Value="img\10.jpg" TargetName="IMG"/>
+                                                </DataTrigger>
+                                            </DataTemplate.Triggers>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTemplateColumn Header="Dringend">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Image x:Name="IMG" Width="25" Source="img\yes.jpg" />
+                                            <DataTemplate.Triggers>
+                                                <DataTrigger Binding="{Binding Path=urgent}" Value="False">
+                                                    <Setter Property="Source" Value="img\no.jpg" TargetName="IMG"/>
+                                                </DataTrigger>
+                                            </DataTemplate.Triggers>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTextColumn Header="Antwort" Binding="{Binding answer}"/>
+                                <DataGridTemplateColumn Header="Text-Farbe">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Image x:Name="IMG" Width="25" Source="img\no.jpg" />
+                                            <DataTemplate.Triggers>
+                                                <DataTrigger Binding="{Binding Path=textColor}" Value="Red">
+                                                    <Setter Property="Source" Value="img\red.jpg" TargetName="IMG"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding Path=textColor}" Value="Black">
+                                                    <Setter Property="Source" Value="img\black.jpg" TargetName="IMG"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding Path=textColor}" Value="Blue">
+                                                    <Setter Property="Source" Value="img\blue.jpg" TargetName="IMG"/>
+                                                </DataTrigger>
+                                            </DataTemplate.Triggers>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTextColumn Header="Datum" Binding="{Binding date}"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </StackPanel>
+                    <WrapPanel Margin="20,30">
+                        <Label Margin="5,0,0,0" FontSize="16" Width="213" VerticalAlignment="Center" HorizontalAlignment="Left">NICHT beantwortete Fragen:</Label>
+                        <Slider x:Name="sliderQuestionsNotAnswered" Style="{StaticResource Horizontal_Slider}" VerticalAlignment="Center" 
+                            IsSnapToTickEnabled="True" TickFrequency="1" Minimum="0" Maximum="10" Width="350" Margin="20,0,0,0" IsEnabled="False"/>
+                        <Label Margin="57,0,0,0" FontSize="16" Width="162" VerticalAlignment="Center" HorizontalAlignment="Left">Total Rot-text Fragen:</Label>
+                        <Slider x:Name="sliderRedQuestions" Style="{StaticResource Horizontal_Slider}" VerticalAlignment="Center" 
+                            IsSnapToTickEnabled="True" TickFrequency="1" Minimum="0" Maximum="10" Width="350" Margin="20,0,50,0" IsEnabled="False"/>
+                    </WrapPanel>
+                    <WrapPanel Margin="20,0">
+                        <Label Margin="40,0,0,0" FontSize="16" Width="177" VerticalAlignment="Center" HorizontalAlignment="Left">Total dringende Fragen:</Label>
+                        <Slider x:Name="sliderUrgentQuestions" Style="{StaticResource Horizontal_Slider}" VerticalAlignment="Center" 
+                            IsSnapToTickEnabled="True" TickFrequency="1" Minimum="0" Maximum="10" Width="350" Margin="22,0,0,0" IsEnabled="False"/>
+                        <Label Margin="25,0,0,0" FontSize="16" Width="194" VerticalAlignment="Center" HorizontalAlignment="Left">Total Schwarz-text Fragen:</Label>
+                        <Slider x:Name="sliderBlackQuestions" Style="{StaticResource Horizontal_Slider}" VerticalAlignment="Center" 
+                            IsSnapToTickEnabled="True" TickFrequency="1" Minimum="0" Maximum="10" Width="350" Margin="20,0,50,0" IsEnabled="False"/>
+                    </WrapPanel>
+                    <WrapPanel Margin="20,20">
+                        <Label Margin="42,0,0,0" FontSize="16" Width="175" VerticalAlignment="Center" HorizontalAlignment="Left">Gesamtzahl der Fragen:</Label>
+                        <Slider x:Name="sliderTotalQuestions" Style="{StaticResource Horizontal_Slider}" VerticalAlignment="Center" 
+                            IsSnapToTickEnabled="True" TickFrequency="1" Minimum="0" Maximum="10" Width="350" Margin="23,0,50,0" IsEnabled="False"/>
+                        <Label Margin="2,0,0,0" FontSize="16" Width="166" VerticalAlignment="Center" HorizontalAlignment="Left">Total Blau-text Fragen:</Label>
+                        <Slider x:Name="sliderBlueQuestions" Style="{StaticResource Horizontal_Slider}" VerticalAlignment="Center" 
+                            IsSnapToTickEnabled="True" TickFrequency="1" Minimum="0" Maximum="10" Width="350" Margin="20,0,50,0" IsEnabled="False"/>
+                    </WrapPanel>
+                </StackPanel>
+            </WrapPanel>
+
+        </StackPanel>
+
+        <StackPanel Name="footerPanel" Margin="0,0,0,0" VerticalAlignment="Bottom" Height="40">
+            <Label VerticalAlignment="Center" FontFamily="Raleway" FontSize="16" HorizontalAlignment="Center" Foreground="White" FontWeight="Bold" Width="Auto" Height="30" Content="easySolution GmbH • Moosheide 120 • Willich • Telefon: 02154/922550"/>
+        </StackPanel>
+    </Grid>
+</Window>
